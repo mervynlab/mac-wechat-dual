@@ -14,7 +14,7 @@ macOS 微信双开 / 多开的一键脚本与原理说明。
 ## 快速开始
 
 ```bash
-git clone https://github.com/<your-name>/mac-wechat-dual.git
+git clone https://github.com/mervynlhcn-cyber/mac-wechat-dual.git
 cd mac-wechat-dual
 chmod +x wechat-dual.sh
 ./wechat-dual.sh install        # 生成并启动 /Applications/WeChat2.app
