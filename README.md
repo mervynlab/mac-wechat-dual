@@ -48,13 +48,17 @@ cp wechat-dual.sh ~/.local/bin/wechat-dual   # 或 /usr/local/bin/wechat-dual
 
 ## 用法
 
+```bash
+./wechat-dual.sh <命令> [参数]
+```
+
 | 命令 | 说明 |
 |---|---|
-| `wechat-dual.sh install [N]` | 创建并启动第 N 个微信（默认 2）。`install 3` 生成 WeChat3，以此类推 |
-| `wechat-dual.sh open [N]` | 启动已创建的副本 |
-| `wechat-dual.sh list` | 列出所有副本和版本，提示哪些落后于原版 |
-| `wechat-dual.sh remove N` | 删除副本，**保留**该账号聊天数据 |
-| `wechat-dual.sh remove N --purge` | 删除副本**并删除**该账号本地数据（需输入 `yes` 确认，不可恢复） |
+| `install [N]` | 创建并启动第 N 个微信，默认 2；`install 3` 生成 WeChat3 |
+| `open [N]` | 启动已创建的副本 |
+| `list` | 列出所有副本及版本，标出落后于原版的 |
+| `remove N` | 删除副本，**保留**该账号聊天数据 |
+| `remove N --purge` | 删除副本**并删除**该账号本地数据（需输入 `yes` 确认，不可恢复） |
 
 环境变量：
 
@@ -83,12 +87,40 @@ macOS 用 **Bundle ID** 识别一个 App，微信的 Bundle ID 是 `com.tencent.
 
 ### 脚本做了什么
 
-| 步骤 | 操作 | 作用 |
-|---|---|---|
-| 1. 复制 | `cp -Rc WeChat.app WeChat2.app` | `-c` 使用 APFS 克隆（copy-on-write），1.4 GB 的 App 秒级复制，几乎不占空间 |
-| 2. 改 ID | 将副本 `Info.plist` 的 `CFBundleIdentifier` 改为 `com.tencent.xinWeChat2` | 系统视为另一个 App：允许同时运行，并分配独立数据目录 `~/Library/Containers/com.tencent.xinWeChat2` |
-| 3. 移除扩展 | 删除副本的 `Contents/PlugIns` | 分享扩展与文件提供扩展的 ID 仍与原版相同，双份注册可能干扰原版 |
-| 4. 重签名 | `codesign --force --deep --sign -` | 修改 Info.plist 后原签名失效，系统会拒绝启动；`-` 表示本地临时签名（ad-hoc），在本机运行没有问题 |
+`install` 一共四步，原版 `WeChat.app` 全程只读：
+
+**① 复制一份微信**
+
+```bash
+cp -Rc /Applications/WeChat.app /Applications/WeChat2.app
+```
+
+`-c` 使用 APFS 克隆（copy-on-write）：副本与原版共享磁盘块，只有被改动的文件才真正占空间，1.4 GB 的微信秒级复制完成。
+
+**② 改 Bundle ID**
+
+```bash
+/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.tencent.xinWeChat2" \
+  /Applications/WeChat2.app/Contents/Info.plist
+```
+
+系统据此把副本当成另一个 App：允许和原版同时运行，并给它分配独立的数据目录 `~/Library/Containers/com.tencent.xinWeChat2`。同时把显示名改为「微信2」，方便在程序坞里区分。
+
+**③ 移除副本里的扩展**
+
+```bash
+rm -rf /Applications/WeChat2.app/Contents/PlugIns
+```
+
+分享扩展、文件提供扩展的 ID 仍和原版一样，两份同时注册可能干扰原版的分享菜单和访达集成，所以副本不带它们。
+
+**④ 本地重新签名**
+
+```bash
+codesign --force --deep --sign - /Applications/WeChat2.app
+```
+
+改过 `Info.plist` 后腾讯原签名失效，系统会拒绝启动；`--sign -` 表示本机临时签名（ad-hoc），在自己电脑上运行没有问题。最后清除隔离属性并启动副本。
 
 一句话：**Bundle ID 是身份证号，沙盒是按身份证号分配的房间，签名是防伪章**——复制一份、改号、盖自己的章，系统就再分一个房间。
 
