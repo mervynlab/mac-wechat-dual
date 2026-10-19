@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # mac-wechat-dual: 在 macOS 上为微信创建独立副本，实现双开/多开。
+# https://github.com/mervynlab/mac-wechat-dual
 # 原理：复制 WeChat.app → 修改 Bundle ID（系统视为另一个 App，分配独立沙盒数据目录）→ 本地临时签名。
 # 不修改原版 WeChat.app，不修改微信任何代码。
 set -euo pipefail
 
-VERSION="1.0.0"
+VERSION="1.0.1"
 SRC="${WECHAT_APP:-/Applications/WeChat.app}"
 APP_DIR="${WECHAT_DUAL_DIR:-/Applications}"
 BASE_ID="com.tencent.xinWeChat"

@@ -1,32 +1,50 @@
 # mac-wechat-dual
 
-macOS 微信双开 / 多开的一键脚本与原理说明。
+[![macOS](https://img.shields.io/badge/macOS-12%2B-black?logo=apple)](#已验证环境)
+[![WeChat](https://img.shields.io/badge/WeChat-4.x-07C160)](#已验证环境)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- 不修改原版 `WeChat.app`，不改动微信任何代码，不注入、不 Hook
-- 每个副本拥有**独立的数据目录**，账号、聊天记录互不干扰
-- 基于 APFS 克隆复制，副本**几乎不占额外磁盘空间**
-- 微信更新后重跑一条命令即可同步，聊天数据保留
+**macOS 微信双开 / 多开**：一条命令生成第二个微信，独立登录、独立数据，原版微信一个字节都不改。
 
-> 已验证环境：macOS 15 (Apple Silicon)，微信 4.1.13。其它版本原理相同，欢迎反馈。
+- 🧩 **零侵入**：不修改原版 `WeChat.app`，不改动微信代码，不注入、不 Hook
+- 🗂 **数据隔离**：每个副本拥有独立的沙盒数据目录，账号、聊天记录互不干扰
+- 💾 **几乎不占空间**：基于 APFS 克隆复制，1.4 GB 的微信秒级复制
+- 🔄 **跟随更新**：原版升级后重跑一条命令即可同步，聊天数据保留
+- 🧹 **随时还原**：一条命令删除副本，可选同时清理数据
 
 ---
 
 ## 快速开始
 
 ```bash
-git clone https://github.com/mervynlhcn-cyber/mac-wechat-dual.git
+git clone https://github.com/mervynlab/mac-wechat-dual.git
 cd mac-wechat-dual
-chmod +x wechat-dual.sh
 ./wechat-dual.sh install        # 生成并启动 /Applications/WeChat2.app
 ```
 
-稍等几秒，会弹出第二个微信的登录窗口，扫码登录第二个账号即可。之后直接在启动台 / 应用程序里打开 **WeChat2**。
+几秒后会弹出第二个微信的登录窗口，扫码登录第二个账号即可。之后在启动台 / 应用程序里直接打开 **WeChat2**。
 
-可选：放进 PATH，随处可用
+不想 clone？只下载脚本也可以（建议先打开链接看一眼脚本内容再运行）：
 
 ```bash
-cp wechat-dual.sh /usr/local/bin/wechat-dual   # 或 ~/.local/bin/wechat-dual
+curl -fsSLO https://raw.githubusercontent.com/mervynlab/mac-wechat-dual/main/wechat-dual.sh
+chmod +x wechat-dual.sh && ./wechat-dual.sh install
 ```
+
+可选：放进 PATH，随处可用：
+
+```bash
+cp wechat-dual.sh ~/.local/bin/wechat-dual   # 或 /usr/local/bin/wechat-dual
+```
+
+### 已验证环境
+
+| macOS | 芯片 | 微信版本 | 结果 |
+|---|---|---|---|
+| 15.3 | Apple Silicon | 4.1.13 | ✅ 双开正常 |
+| 15.3 | Apple Silicon | 4.1.15 | ✅ 原版升级后重跑 `install`，第二个账号数据保留 |
+
+其它版本原理相同。遇到问题或在新版本上验证成功，欢迎提 [Issue](https://github.com/mervynlab/mac-wechat-dual/issues) 补充这张表。
 
 ## 用法
 
@@ -123,3 +141,7 @@ macOS 用 **Bundle ID** 识别一个 App，微信的 Bundle ID 是 `com.tencent.
 ## License
 
 [MIT](LICENSE)
+
+## 作者
+
+[@mervynlab](https://github.com/mervynlab) · 觉得有用就点个 ⭐ Star 吧
